@@ -5,7 +5,7 @@ android {
     defaultConfig {
         applicationId "com.example.submission_3"
         minSdkVersion 21
-        buildConfigField("String", "TMDB_API_KEY", '"c184f7e4cec0ace78948ef31fbc18b8e"')
+        buildConfigField("String", "TMDB_API_KEY", '"9d7f6bbc95d4db740e5763a39a73a659"')
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"

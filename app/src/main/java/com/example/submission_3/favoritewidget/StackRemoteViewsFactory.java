@@ -11,7 +11,7 @@ import android.widget.RemoteViewsService;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.Target;
 import com.example.submission_3.R;
-import com.example.submission_3.moviespackage.Movie;
+import com.example.submission_3.model.Movie;
 
 import static com.example.submission_3.databaseprovider.MovieProvider.URI_MOVIE;
 

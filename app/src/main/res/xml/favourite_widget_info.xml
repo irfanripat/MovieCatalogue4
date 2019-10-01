@@ -4,7 +4,7 @@
     android:initialLayout="@layout/favourite_widget"
     android:minWidth="100dp"
     android:minHeight="70dp"
-    android:previewImage="@drawable/logo"
+    android:previewImage="@drawable/ic_logo"
     android:updatePeriodMillis="0"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"></appwidget-provider>

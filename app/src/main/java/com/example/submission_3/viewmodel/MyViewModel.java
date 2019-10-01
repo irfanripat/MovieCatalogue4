@@ -8,18 +8,14 @@ import androidx.annotation.NonNull;
 import android.widget.Toast;
 
 import com.example.submission_3.BuildConfig;
-import com.example.submission_3.GenreTVResponse;
-import com.example.submission_3.ListMovieGenre;
-import com.example.submission_3.GenreResponse;
-import com.example.submission_3.ListTVGenre;
 import com.example.submission_3.retrofitservice.RetrofitService;
 import com.example.submission_3.api.ApiMovie;
 import com.example.submission_3.api.ApiTV;
-import com.example.submission_3.moviespackage.Movie;
-import com.example.submission_3.moviespackage.MovieResponse;
+import com.example.submission_3.model.Movie;
+import com.example.submission_3.model.MovieResponse;
 import com.example.submission_3.room.DBRoom;
-import com.example.submission_3.tvshowpackage.TVShow;
-import com.example.submission_3.tvshowpackage.TVShowResponse;
+import com.example.submission_3.model.TVShow;
+import com.example.submission_3.model.TVShowResponse;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,16 +28,10 @@ import retrofit2.Response;
 
 public class MyViewModel extends ViewModel {
     public static final String API_KEY = BuildConfig.TMDB_API_KEY;
-    public static final String LANGUAGE = "en-US";
-    private MutableLiveData<List<ListMovieGenre>> listGenres = new MutableLiveData<>();
-    private MutableLiveData<List<ListTVGenre>> listTvGenres = new MutableLiveData<>();
+    public static String LANGUAGE = "en-US";
+
     private MutableLiveData<List<Movie>> listMovies = new MutableLiveData<>();
     private MutableLiveData<List<TVShow>> listTvs = new MutableLiveData<>();
-    public static String getCurrDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        Date date = new Date();
-        return dateFormat.format(date);
-    }
 
     public LiveData<List<TVShow>> getTvs(Context context) {
         loadTvs(context);
@@ -55,61 +45,13 @@ public class MyViewModel extends ViewModel {
         return listMovies;
     }
 
-    public LiveData<List<Movie>> getSearch(String newText) {
-        searchMovie(newText);
-        return listMovies;
-    }
-
-    public LiveData<List<TVShow>> getSearchTv(String newText) {
-        searchTv(newText);
-        return listTvs;
-    }
-
-    public LiveData<List<ListMovieGenre>> getGenreList()
-    {
-        generateGenreList();
-        return listGenres;
-    }
-    public LiveData<List<ListTVGenre>> getTVGenre()
-    {
-        generateGenreTV();
-        return listTvGenres;
-    }
-    private void generateGenreList()
-    {
-        final ApiMovie apiInterface = RetrofitService.createService(ApiMovie.class);
-        Call<GenreResponse> call = apiInterface.getGenreList(API_KEY,LANGUAGE);
-        call.enqueue(new Callback<GenreResponse>() {
-            @Override
-            public void onResponse(Call<GenreResponse> call, Response<GenreResponse> response) {
-                listGenres.setValue(response.body().getGenres());
-            }
-
-            @Override
-            public void onFailure(Call<GenreResponse> call, Throwable t) {
-
-            }
-        });
-    }
-    private void generateGenreTV()
-    {
-        final ApiTV apiInterface = RetrofitService.createService(ApiTV.class);
-        Call<GenreTVResponse> call = apiInterface.getListGenre(API_KEY);
-        call.enqueue(new Callback<GenreTVResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<GenreTVResponse> call, Response<GenreTVResponse> response) {
-
-                    listTvGenres.setValue(response.body().getGenreList());
-
-            }
-
-            @Override
-            public void onFailure(Call<GenreTVResponse> call, Throwable t) {
-
-            }
-        });
-    }
     private void loadMovies(final Context context) {
+        if (Locale.getDefault().getLanguage().equals(new Locale("id").getLanguage())) {
+            LANGUAGE = "id-ID";
+        } else {
+            LANGUAGE = "en-US";
+        }
+
         final ApiMovie apiInterface = RetrofitService.createService(ApiMovie.class);
         Call<MovieResponse> call = apiInterface.getTopRatedMovies(API_KEY,LANGUAGE);
         call.enqueue(new Callback<MovieResponse>() {
@@ -125,39 +67,7 @@ public class MyViewModel extends ViewModel {
         });
     }
 
-    private void searchMovie(final String newText) {
 
-        final ApiMovie apiInterface = RetrofitService.createService(ApiMovie.class);
-
-        Call<MovieResponse> call = apiInterface.getListSearchMovie(newText, API_KEY);
-        call.enqueue(new Callback<MovieResponse>() {
-            @Override
-            public void onResponse(Call<MovieResponse> call, Response<MovieResponse> response) {
-                listMovies.setValue(response.body().getResults());
-            }
-
-            @Override
-            public void onFailure(Call<MovieResponse> call, Throwable t) {
-
-            }
-        });
-    }
-
-    private void searchTv(final String newText) {
-
-        ApiTV apiInterface = RetrofitService.createService(ApiTV.class);
-        Call<TVShowResponse> call = apiInterface.getListSearchTvs(newText, API_KEY);
-        call.enqueue(new Callback<TVShowResponse>() {
-            @Override
-            public void onResponse(Call<TVShowResponse> call, Response<TVShowResponse> response) {
-                listTvs.setValue(response.body().getResults());
-            }
-
-            @Override
-            public void onFailure(Call<TVShowResponse> call, Throwable t) {
-            }
-        });
-    }
 
     public LiveData<List<Movie>> getFavList(Context context) {
         MutableLiveData<List<Movie>> movieData = new MutableLiveData<>();
@@ -178,6 +88,11 @@ public class MyViewModel extends ViewModel {
 
 
     private void loadTvs(final Context context) {
+        if (Locale.getDefault().getLanguage().equals(new Locale("id").getLanguage())) {
+            LANGUAGE = "id-ID";
+        } else {
+            LANGUAGE = "en-US";
+        }
         ApiTV apiInterface = RetrofitService.createService(ApiTV.class);
         Call<TVShowResponse> call = apiInterface.getTopRatedTvShow(API_KEY,LANGUAGE);
         call.enqueue(new Callback<TVShowResponse>() {

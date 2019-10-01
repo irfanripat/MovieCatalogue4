@@ -7,7 +7,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 import android.database.Cursor;
 
-import com.example.submission_3.moviespackage.Movie;
+import com.example.submission_3.model.Movie;
 
 import java.util.List;
 

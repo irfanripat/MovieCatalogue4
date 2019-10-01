@@ -5,7 +5,7 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
-import com.example.submission_3.tvshowpackage.TVShow;
+import com.example.submission_3.model.TVShow;
 
 import java.util.List;
 

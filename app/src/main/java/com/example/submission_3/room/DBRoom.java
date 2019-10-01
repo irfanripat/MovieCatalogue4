@@ -5,15 +5,12 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import android.content.Context;
 
-import com.example.submission_3.ListMovieGenre;
-import com.example.submission_3.ListTVGenre;
-import com.example.submission_3.dao.GenreDAO;
 import com.example.submission_3.dao.MovieDAO;
 import com.example.submission_3.dao.TvDAO;
-import com.example.submission_3.moviespackage.Movie;
-import com.example.submission_3.tvshowpackage.TVShow;
+import com.example.submission_3.model.Movie;
+import com.example.submission_3.model.TVShow;
 
-@Database(entities = {Movie.class, TVShow.class, ListMovieGenre.class, ListTVGenre.class}, version = 100, exportSchema = false)
+@Database(entities = {Movie.class, TVShow.class}, version = 100, exportSchema = false)
 public abstract class DBRoom extends RoomDatabase {
     private static DBRoom dbRoom;
 
@@ -30,7 +27,5 @@ public abstract class DBRoom extends RoomDatabase {
     public abstract MovieDAO movieDao();
 
     public abstract TvDAO tvDao();
-
-    public abstract GenreDAO genreDao();
 
 }

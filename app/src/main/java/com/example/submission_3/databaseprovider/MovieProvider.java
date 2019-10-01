@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.submission_3.dao.MovieDAO;
-import com.example.submission_3.moviespackage.Movie;
+import com.example.submission_3.model.Movie;
 import com.example.submission_3.room.DBRoom;
 
 public class MovieProvider extends ContentProvider {

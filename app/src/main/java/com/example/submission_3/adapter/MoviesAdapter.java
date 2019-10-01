@@ -3,37 +3,32 @@ package com.example.submission_3.adapter;
 import android.content.Context;
 import android.content.Intent;
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.bumptech.glide.request.RequestOptions;
-import com.example.submission_3.DetailActivity;
-import com.example.submission_3.ListMovieGenre;
+import com.example.submission_3.activity.DetailActivity;
 import com.example.submission_3.R;
-import com.example.submission_3.moviespackage.Movie;
+import com.example.submission_3.model.Movie;
 
-import java.util.ArrayList;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 //Adapter Movies
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder> {
     private Context context;
     private List<Movie> movies;
-    private List<ListMovieGenre> allGenres;
-    public MoviesAdapter(Context context, List<Movie> movies, List<ListMovieGenre> allGenres) {
+
+    public MoviesAdapter(Context context, List<Movie> movies) {
         this.context = context;
         this.movies = movies;
-        this.allGenres = allGenres;
     }
 
 
@@ -41,66 +36,45 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(context).inflate(R.layout.list_movies, viewGroup, false);
+        View v = LayoutInflater.from(context).inflate(R.layout.item_movie, viewGroup, false);
         return new ViewHolder(v);
 
     }
-    private boolean genreExist;
+
     @Override
     public void onBindViewHolder(@NonNull MoviesAdapter.ViewHolder viewHolder, int i) {
-        String poster = "https://image.tmdb.org/t/p/w500" + movies.get(viewHolder.getAdapterPosition()).getPosterPath();
-
+        viewHolder.tvTitle.setText(movies.get(viewHolder.getAdapterPosition()).getTitle());
+        SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        try{
+            Date date = parser.parse(movies.get(viewHolder.getAdapterPosition()).getReleaseDate());
+            SimpleDateFormat formatter= new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+            String formatedDate=formatter.format(date);
+            viewHolder.tvRelease.setText(formatedDate);
+        }catch (ParseException e){
+            e.printStackTrace();
+        }
+        if (movies.get(viewHolder.getAdapterPosition()).getOverview().length() == 0) {
+            movies.get(viewHolder.getAdapterPosition()).setOverview("Maaf belum tersedia dalam bahasa indonesia");
+            viewHolder.tvOverview.setText(movies.get(viewHolder.getAdapterPosition()).getOverview());
+        } else {
+            viewHolder.tvOverview.setText(movies.get(viewHolder.getAdapterPosition()).getOverview());
+        }
         Glide.with(context)
-                .load(poster)
-                .apply(RequestOptions.bitmapTransform(new RoundedCorners(25)))
-                .into(viewHolder.img);
-        viewHolder.txtTitle.setText(movies.get(viewHolder.getAdapterPosition()).getTitle());
-        viewHolder.txtDateStart.setText(movies.get(viewHolder.getAdapterPosition()).getReleaseDate().split("-")[0]);
+                .load("https://image.tmdb.org/t/p/w154" + movies.get(viewHolder.getAdapterPosition()).getPosterPath())
+                .into(viewHolder.imgPoster);
 
-        double score = movies.get(viewHolder.getAdapterPosition()).getVoteAverage() * 10;
-        viewHolder.ratingBar.setRating((float) ((score * 5) / 100));
-        viewHolder.rating.setText((movies.get(viewHolder.getAdapterPosition()).getVoteAverage()).toString());
-        if(movies.get(viewHolder.getAdapterPosition()).getGenre()==null) {
-            viewHolder.txtGenres.setText(movies.get(viewHolder.getAdapterPosition()).getGenres_string());
-            genreExist = false;
-        }
-        else{
-            viewHolder.txtGenres.setText(getGenres(movies.get(viewHolder.getAdapterPosition()).getGenre()));
-            genreExist = true;
-        }
-        viewHolder.cardView.setOnClickListener((View v) ->{
-            Intent detailIntent = new Intent(context, DetailActivity.class);
-            if(genreExist) {
-                detailIntent.putExtra(DetailActivity.GENRE_DATA, getGenres(movies.get(viewHolder.getAdapterPosition()).getGenre()));
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent detailIntent = new Intent(context, DetailActivity.class);
+                detailIntent.putExtra(DetailActivity.EXTRA_MOVIE, movies.get(viewHolder.getAdapterPosition()));
+                detailIntent.putExtra("isMovie",true);
+                context.startActivity(detailIntent);
             }
-            else{
-                Toast.makeText(context, movies.get(viewHolder.getAdapterPosition()).getGenres_string(), Toast.LENGTH_SHORT).show();
-                detailIntent.putExtra(DetailActivity.GENRE_DATA, movies.get(viewHolder.getAdapterPosition()).getGenres_string());
-            }
-            detailIntent.putExtra(DetailActivity.EXTRA_DATA, movies.get(viewHolder.getAdapterPosition()));
-            detailIntent.putExtra("check", true);
-            context.startActivity(detailIntent);
         });
 
 
 
-    }
-
-    private String getGenres(List<Integer> genreIds) {
-
-        List<String> movieGenres = new ArrayList<>();
-        for (Integer genreId : genreIds)
-        {
-            for (ListMovieGenre genre : allGenres)
-            {
-                if (genre.getId().equals(genreId))
-                {
-                    movieGenres.add(genre.getName());
-                    break;
-                }
-            }
-        }
-        return TextUtils.join(", ", movieGenres);
     }
 
     @Override
@@ -109,22 +83,14 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.ViewHolder
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView img;
-        TextView txtDateStart;
-        TextView rating;
-        TextView txtTitle;
-        TextView txtGenres;
-        RatingBar ratingBar;
-        CardView cardView;
+        TextView tvTitle, tvRelease, tvOverview;
+        ImageView imgPoster;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            ratingBar = itemView.findViewById(R.id.rating_id);
-            rating = itemView.findViewById(R.id.rating_tv);
-            img = itemView.findViewById(R.id.img_id);
-            txtDateStart = itemView.findViewById(R.id.date_id);
-            txtTitle = itemView.findViewById(R.id.title_id);
-            txtGenres = itemView.findViewById(R.id.genre_id);
-            cardView = itemView.findViewById(R.id.movie_cv);
+            tvTitle = itemView.findViewById(R.id.tv_name);
+            tvRelease = itemView.findViewById(R.id.tv_release);
+            tvOverview = itemView.findViewById(R.id.tv_desc);
+            imgPoster = itemView.findViewById(R.id.img_photo);
         }
     }
 
